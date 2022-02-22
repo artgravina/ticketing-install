@@ -111,6 +111,22 @@ The secret information to be used by GitHub workflows
 
 This should kick off a chain of workflows. Check that tests and workflows ran error free. If so, the cluster should up.
 
+## Publish to GitHub and enable workflows
+
+Github will test and publish Services when changed. To put into effect;
+Note: This step will not initate workflows. See next step
+
+- Create a repository on GitHub
+- Commit your local changes to the master branch
+- Enable all workflows
+  - Click `Actions`. This will give you a list of all workflow. Enable each one.
+
+## Initiate Workflows
+
+To be done
+
+## Verify Cluster up and running
+
 - `run:` kubectl get pods.
 - you should see all your pods running. See below for an example:
 
