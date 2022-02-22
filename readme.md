@@ -7,6 +7,7 @@
 <h3 align="center">Microservices Example</h3>
   <p align="center">
     A sample app to deploy, and scale an E-Commerce app using  <strong>Microservices</strong> built with Node, React, Docker and Kubernetes.
+    This readme describes deployment to your desktop. See <a src="readme-cloud.md">readme-cloud.md</a> for description on deploying to the Cloud.
 
   </p>
 </div>
@@ -45,6 +46,14 @@ Microservices are the number one solution for building and scaling out apps that
 # Overview of the app
 
 Sign up, Create a Ticket you want to sell. Another user can find the Ticket and Purchase. Payment for the ticket is through Stripe. The UI is not critical and is bare bones. The main point is the Microservices strategy employed. The app runs locally with `Docker Desktop`. For production it is deployed to the cloud. This app uses `DigitalOcean`, but can easily be ported to AWS, Google Cloud, etc.
+
+# Screen Shots
+
+- [Ticket List (home)](readme-images/HomePage.png)
+- [New Ticket for Sale](readme-images/NewTicket.png)
+- [Ticket Detail](readme-images/TicketDetail.png)
+- [Purchase Ticket](readme-images/Purchase.png)
+- [Pay for Ticket](readme-images/CreditCard.png)
 
 # Services
 
@@ -92,21 +101,25 @@ Not a service but the library of common code to be shared by all services. Utili
 
 # Installation
 
-## Install this app in the directory of your choice
+## 1. Install this app in the directory of your choice
 
 ```sh
 git clone https://github.com/artgravina/ticketing.git
 ```
 
-## Install the NPM packages in the following root directories: auth, client, common, expiration, orders, payments
+## 2. Install the NPM packages
 
 ```sh
-cd [root directory. i.e auth, payments, etc]
+// following dirctories require the following:
+// auth, client, common, expiration, orders, payments
+
+cd auth
 npm install
 cd ..
+etc...
 ```
 
-## Install Docker
+## 3. Install Docker locally
 
 Please note. You must be familiar with Docker and Kubernetes to understand this app.
 
@@ -118,30 +131,101 @@ Please note. You must be familiar with Docker and Kubernetes to understand this 
 - Note: Docker also contains `Kubernetes`.
 - Note: The directory `infra` contains all the Docker Deployment and Service files.
 
-## Install Skaffold
+## 4. Enter your Docker Id from the above step into source
+
+- Use your editor to search and replace [DOCKER_ID] in the source
+- Note your Docker Id. For example: johnsmith
+- Search for [DOCKER_ID] (include the brackets)
+- Replace [DOCKER_ID] with johnsmith (do not include any quotes)
+
+## 5. Enroll in NPM package Manager
+
+We will be creating an NPM Package that all services can import to share code. See `common` directory.
+
+- Go to [Npm Package Manager](https://www.npmjs.com)
+- Signup
+- Add Organization (menu item in drop down under your account icon)
+- Select Public option
+- Note your Organization Name
+
+## 6. Enter NPM Organization Name from above step into source
+
+- Use your editor to search and replace [NPM_ORGANIZATION_NAME] in the source
+- Search for [NPM_ORGANIZATION_NAME] (include the brackets)
+- Replace [NPM_ORGANIZATION_NAME] with your Organization Name (do not include any quotes)
+
+## 7. Publish Initial Package to NPM
+
+This step is required to set up your package.
+
+```sh
+  cd common
+  git init
+  git add .
+  git commit -m "initial commit"
+  npm publish --access public
+```
+
+## 8. Updating your NPM package
+
+Whenever you update code in common and want to republish do the following:
+
+```sh
+  cd common
+  npm run pub
+```
+
+Once you have published the package ensure all services using it have their package updated:
+
+```sh
+  // following require updating
+  //auth, expiration, orders, payments, tickets
+
+  cd auth
+  npm update @[ORGANIZATION_NAME]/common
+```
+
+## 9. Install Skaffold
 
 Skaffold handles the workflow for building, pushing, and deploying your application. It watches for any code changes.
 
 - Go to `skaffold.com` and follow installation instructions for your machine type.
 
-## Install kubectl. The kubernetes command-line tool
+## 10. Install kubectl. The kubernetes command-line tool
 
 - Go to `skaffold.com` and follow instructions for your machine type.
 
-## Install Ingress-Nginx to create a Load Balancer Service + an Ingress Controller within Kubernetes.
+## 11. Enable Kubernetes in Docker Desktop.
+
+- Go to Preferences / Kubernetes.
+- Enable Kubernetes.
+
+## 12. Go to [Strip Web Site](stripe.com) and register
+
+- Obtain a developer account.
+- Get a secret key to allow access. Note this key
+
+## 13. Install secret keys into cluster
+
+These are secret keys derived from Kubernets cluster by app
+
+- Make sure you have your local machine selected as the Kubernetes cluster
+- `run:` kubectl create secret generic jwt-secret --from-literal=JWT_KEY=abcdefg
+- `run:` kubectl create secret generic stripe-secret --from-literal=STRIPE_KEY=<your secret key defined during Stripe install>
+
+## 14. Install Ingress-Nginx to create a Load Balancer Service + an Ingress Controller within Kubernetes.
+
+- Go to [Ingress-Nginx Installation Guide](https://kubernetes.github.io/ingress-nginx/deploy/#docker-desktop)
+- Quick start. Get YAML command to run in terminal. See below for an example
+- If running Docker Desktop that's all that's necessary.
+- If running in other environments follow the directions.
+- see `infra/k8s-dev and infra/k8s-prod` for Ingress config files.
 
 ```sh
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.1.1/deploy/static/provider/cloud/deploy.yaml
 ```
 
-- see `infra/k8s-dev and infra/k8s-prod` for Ingress config files.
-
-## Enable Kubernetes in Docker Desktop.
-
-- Go to Preferences / Kubernetes.
-- Enable Kubernetes.
-
-## Edit hosts file to create a domain name for testing
+## 13. Edit hosts file to create a domain name for testing
 
 - This enables us to have multiple projects running with the Kubernetes cluster. Add following line to your hosts file.
 
@@ -149,7 +233,7 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/cont
 127.0.0.1 ticketing-dev
 ```
 
-## Nats Streaming Service
+## 14. Nats Streaming Service
 
 This is the service we use to manage the distribution of Events in the app. It is included in Kubernetes cluster via a standard deployment. See `infra\k8s\nats-depl.yaml`.
 
@@ -166,13 +250,13 @@ cd ticketing // root directory
 skaffold dev
 ```
 
-### Wait a few minutes and then run
+## 1. Wait a few minutes and then run
 
 ```sh
 kubectl get pods
 ```
 
-### You should see all of the pods started without errors:
+## 2. You should see all of the pods started without errors:
 
 ```
 NAME                                     READY   STATUS    RESTARTS   AGE
@@ -190,7 +274,7 @@ tickets-depl-6cf69fc455-x7n9p            1/1     Running   1          2d
 tickets-mongo-depl-8546d98f5b-bxzts      1/1     Running   0          3d19h
 ```
 
-### Run tests for each service
+## 3. Run tests for each service
 
 ```sh
 cd auth
@@ -203,7 +287,7 @@ cd ../payments
 npm run test
 ```
 
-### If all tests pass you can then move on to the browser
+## 4. If all tests pass you can then move on to the browser
 
 http://ticketing-dev
 
