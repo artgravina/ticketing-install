@@ -104,7 +104,7 @@ Not a service but the library of common code to be shared by all services. Utili
 ## 1. Install this app in the directory of your choice
 
 ```sh
-git clone https://github.com/artgravina/ticketing.git
+git clone https://github.com/artgravina/ticketing-install.git
 ```
 
 ## 2. Install the NPM packages

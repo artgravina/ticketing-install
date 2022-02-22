@@ -89,7 +89,7 @@ We are going to use [NameCheap](namecheap.com) to acquire a DNS name to test the
   - Create a `CNAME Record`, "www" is an alias of "@" and TTL to 30 seconds.
 - Modify the `ingress-srv.yaml` config to point to the above Domain
   - `edit:` infra/k8s-prod/ingress-srv.yaml.
-  - search for 'host:'
+  - search for [CLOUD_HOST]
   - enter your Domain name as the host: For me it would look like:
   ```sh
   - host: www.ticketing-art.art

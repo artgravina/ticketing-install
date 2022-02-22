@@ -8,7 +8,7 @@ metadata:
 spec:
   rules:
     # awaiting get new public host id to change the below more editing
-    - host: www.ticketing-art.art
+    - host: [CLOUD_CLUSTER]
       http:
         paths:
           - path: /api/users/?(.*)
